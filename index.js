@@ -1,5 +1,4 @@
 const express = require('express');
-const Joi = require('joi');
 const joi = require('joi');
 const app = express();
 
@@ -58,9 +57,37 @@ app.post("/api/customers", (req, res) => {
 })
 
 //UPDATE request handler
+app.put("/api/customers/:id", (req, res) => {
+    const customer = customers.find((c) => c.id === parseInt(req.params.id));
+    if(!customer) {
+        res.status(404).send("customer not found");
+    } 
 
+    const {error} = validateCustomer(req.body);
+    
+    if(error) {
+        res.status(404).send(error.details[0].message);
+    }
+
+    customer.name = req.body.name;
+
+    res.send(customer);
+
+})
 //DELETE request handler
+app.delete("/api/customers/:id", (req, res) => {
+    const customer = customers.find((c) => c.id === parseInt(req.params.id));
+    if(!customer) {
+        res.status(404).send("customer not found");
+    } 
 
+    const index = customers.indexOf(customer);
+    customers.splice(index, 1);
+
+
+    res.send("Customer, "+customer.name+" is deleted");
+
+})
 
 //Validation Information
 function validateCustomer(newCustomer){
